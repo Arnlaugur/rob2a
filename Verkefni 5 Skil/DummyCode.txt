@@ -1,0 +1,16 @@
+While(True)
+{
+IfRightDark
+{
+ MotorRight = 60;
+}
+IfLeftDark
+{
+ MotorLeft = 60;
+}
+IfCenterDark
+{
+ MotorLeft = 60;
+ MotorRight = 60;
+}
+}
