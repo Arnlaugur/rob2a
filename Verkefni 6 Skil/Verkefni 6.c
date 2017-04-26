@@ -2,6 +2,8 @@
 #pragma config(Sensor, in2,    lineFollowerCENTER, sensorLineFollower)
 #pragma config(Sensor, in3,    lineFollowerLEFT, sensorLineFollower)
 #pragma config(Sensor, dgtl1,  SonarSensor,    sensorSONAR_cm)
+#pragma config(Sensor, dgtl4,  rightEncoder,   sensorQuadEncoder)
+#pragma config(Sensor, dgtl6,  leftEncoder,    sensorQuadEncoder)
 #pragma config(Motor,  port2,           rightMotor,    tmotorServoContinuousRotation, openLoop, reversed)
 #pragma config(Motor,  port3,           leftMotor,     tmotorServoContinuousRotation, openLoop)
 #pragma config(Motor,  port7,           ArmMotor,      tmotorServoContinuousRotation, openLoop)
@@ -30,24 +32,40 @@
 |*    Analog - Port 2     lineFollowerCENTER  VEX Light Sensor      Front-center, facing down         *|
 |*    Analog - Port 3     lineFollowerLEFT    VEX Light Sensor      Front-left, facing down           *|
 \*-----------------------------------------------------------------------------------------------4246-*/
-void rotate2(){
-	while(SensorValue[rightEncoder] < 420){
-		motor[rightMotor] = 63;
-		motor[leftMotor] = -63;
-	}
-	motor[rightMotor] = 0;
-  motor[leftMotor] = 0;
-}
 
-//+++++++++++++++++++++++++++++++++++++++++++++| MAIN |+++++++++++++++++++++++++++++++++++++++++++++++
-task main()
-{
-  wait1Msec(2000);          // The program waits for 2000 milliseconds before continuing.
-
-  int threshold = 2820;      /* found by taking a reading on both DARK and LIGHT    */
+void followLine(){
+	  int threshold = 2820;      /* found by taking a reading on both DARK and LIGHT    */
                             /* surfaces, adding them together, then dividing by 2. */
-
-   while(SensorValue(SonarSensor) < 50)
+  while(SensorValue(SonarSensor) > 50)
+   {
+    // RIGHT sensor sees dark:
+    if(SensorValue(lineFollowerRIGHT) > threshold)
+    {
+      // counter-steer right:
+      motor[leftMotor]  = 30;
+      motor[rightMotor] = 0;
+    }
+    motor[leftMotor]  = 0;
+    motor[rightMotor] = 0;
+    // CENTER sensor sees dark:
+    while(SensorValue(lineFollowerCENTER) > threshold)
+    {
+      // go straight
+      motor[leftMotor]  = 30;
+      motor[rightMotor] = 30;
+    }
+    motor[leftMotor]  = 0;
+    motor[rightMotor] = 0;
+    // LEFT sensor sees dark:
+    if(SensorValue(lineFollowerLEFT) > threshold)
+    {
+      // counter-steer left:
+      motor[leftMotor]  = 0;
+      motor[rightMotor] = 30;
+    }
+    motor[leftMotor]  = 0;
+    motor[rightMotor] = 0;
+  }while(SensorValue(SonarSensor) > 50)
    {
     // RIGHT sensor sees dark:
     if(SensorValue(lineFollowerRIGHT) > threshold)
@@ -77,6 +95,39 @@ task main()
     motor[leftMotor]  = 0;
     motor[rightMotor] = 0;
   }
-  rotate2();
+}
+void rotate(){
+	while(SensorValue[rightEncoder] > -420){
+		motor[rightMotor] = 63;
+		motor[leftMotor] = -63;
+	}
+	motor[rightMotor] = 0;
+  motor[leftMotor] = 0;
+}
+void closeClaw(){
+  motor[ClawMotor] = 70;
+  wait1Msec(200);
+  motor[ClawMotor] = 0;
+}
+void openClaw(){
+  motor[ClawMotor] = -70;
+  wait1Msec(200);
+  motor[ClawMotor] = 0;
+}
+//+++++++++++++++++++++++++++++++++++++++++++++| MAIN |+++++++++++++++++++++++++++++++++++++++++++++++
+task main()
+{
+	SensorValue[rightEncoder] = 0;
+	openClaw();
+  wait1Msec(2000);          // The program waits for 2000 milliseconds before continuing.
+  followLine();
+  closeClaw();
+  if(SensorValue(SonarSensor) > 50)
+  {
+  rotate();
+  }
+  FollowLine();
+  openClaw();
+
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
