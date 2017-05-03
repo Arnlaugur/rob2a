@@ -34,70 +34,47 @@
 \*-----------------------------------------------------------------------------------------------4246-*/
 
 void followLine(){
-	  int threshold = 2820;      /* found by taking a reading on both DARK and LIGHT    */
+   int threshold = 2800;      /* found by taking a reading on both DARK and LIGHT    */
                             /* surfaces, adding them together, then dividing by 2. */
-  while(SensorValue(SonarSensor) > 50)
-   {
+  while(SensorValue(SonarSensor) >= 17 || SensorValue(SonarSensor) == -1)
+  {
+
     // RIGHT sensor sees dark:
     if(SensorValue(lineFollowerRIGHT) > threshold)
     {
       // counter-steer right:
-      motor[leftMotor]  = 30;
-      motor[rightMotor] = 0;
+      motor[leftMotor]  = 70;
+      motor[rightMotor] = -40;
     }
     motor[leftMotor]  = 0;
-    motor[rightMotor] = 0;
+      motor[rightMotor] = 0;
     // CENTER sensor sees dark:
-    while(SensorValue(lineFollowerCENTER) > threshold)
+    if(SensorValue(lineFollowerCENTER) > threshold)
     {
       // go straight
-      motor[leftMotor]  = 30;
-      motor[rightMotor] = 30;
+      motor[leftMotor]  = 70;
+      motor[rightMotor] = 70;
     }
     motor[leftMotor]  = 0;
-    motor[rightMotor] = 0;
+      motor[rightMotor] = 0;
     // LEFT sensor sees dark:
     if(SensorValue(lineFollowerLEFT) > threshold)
     {
       // counter-steer left:
-      motor[leftMotor]  = 0;
-      motor[rightMotor] = 30;
+      motor[leftMotor]  = -40;
+      motor[rightMotor] = 70;
     }
     motor[leftMotor]  = 0;
-    motor[rightMotor] = 0;
-  }while(SensorValue(SonarSensor) > 50)
-   {
-    // RIGHT sensor sees dark:
-    if(SensorValue(lineFollowerRIGHT) > threshold)
-    {
-      // counter-steer right:
-      motor[leftMotor]  = 30;
       motor[rightMotor] = 0;
-    }
-    motor[leftMotor]  = 0;
-    motor[rightMotor] = 0;
-    // CENTER sensor sees dark:
-    while(SensorValue(lineFollowerCENTER) > threshold)
-    {
-      // go straight
-      motor[leftMotor]  = 30;
-      motor[rightMotor] = 30;
-    }
-    motor[leftMotor]  = 0;
-    motor[rightMotor] = 0;
-    // LEFT sensor sees dark:
-    if(SensorValue(lineFollowerLEFT) > threshold)
-    {
-      // counter-steer left:
-      motor[leftMotor]  = 0;
-      motor[rightMotor] = 30;
-    }
-    motor[leftMotor]  = 0;
-    motor[rightMotor] = 0;
+     if(SensorValue(lineFollowerCENTER) < threshold && SensorValue(lineFollowerLEFT) < threshold && SensorValue(lineFollowerRIGHT) < threshold)
+     {
+       motor[leftMotor] = 70;
+       motor[rightMotor] = -70;
+     }
   }
 }
 void rotate(){
-	while(SensorValue[rightEncoder] > -420){
+	while(SensorValue[rightEncoder] > 420){
 		motor[rightMotor] = 63;
 		motor[leftMotor] = -63;
 	}
@@ -117,17 +94,25 @@ void openClaw(){
 //+++++++++++++++++++++++++++++++++++++++++++++| MAIN |+++++++++++++++++++++++++++++++++++++++++++++++
 task main()
 {
+	while(true)
+	{
+	if(vexRT[Btn7L] == 1){
+	while(1 == 1)
+	{
+
 	SensorValue[rightEncoder] = 0;
 	openClaw();
   wait1Msec(2000);          // The program waits for 2000 milliseconds before continuing.
   followLine();
   closeClaw();
-  if(SensorValue(SonarSensor) > 50)
-  {
+  SensorValue[rightEncoder] = 0;
   rotate();
-  }
-  FollowLine();
+  followLine();
+                            /* surfaces, adding them together, then dividing by 2. */
   openClaw();
-
+  StopAllTasks();
+}
+}
+}
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
