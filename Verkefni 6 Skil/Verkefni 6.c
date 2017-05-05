@@ -36,14 +36,14 @@
 void followLine(){
    int threshold = 2800;      /* found by taking a reading on both DARK and LIGHT    */
                             /* surfaces, adding them together, then dividing by 2. */
-  while(SensorValue(SonarSensor) >= 17 || SensorValue(SonarSensor) == -1)
+  while(SensorValue(SonarSensor) >= 21 || SensorValue(SonarSensor) == -1)
   {
 
     // RIGHT sensor sees dark:
     if(SensorValue(lineFollowerRIGHT) > threshold)
     {
       // counter-steer right:
-      motor[leftMotor]  = 70;
+      motor[leftMotor]  = 100;
       motor[rightMotor] = -40;
     }
     motor[leftMotor]  = 0;
@@ -52,8 +52,8 @@ void followLine(){
     if(SensorValue(lineFollowerCENTER) > threshold)
     {
       // go straight
-      motor[leftMotor]  = 70;
-      motor[rightMotor] = 70;
+      motor[leftMotor]  = 100;
+      motor[rightMotor] = 100;
     }
     motor[leftMotor]  = 0;
       motor[rightMotor] = 0;
@@ -62,7 +62,7 @@ void followLine(){
     {
       // counter-steer left:
       motor[leftMotor]  = -40;
-      motor[rightMotor] = 70;
+      motor[rightMotor] = 100;
     }
     motor[leftMotor]  = 0;
       motor[rightMotor] = 0;
@@ -73,17 +73,9 @@ void followLine(){
      }
   }
 }
-void rotate(){
-	while(SensorValue[rightEncoder] > 420){
-		motor[rightMotor] = 63;
-		motor[leftMotor] = -63;
-	}
-	motor[rightMotor] = 0;
-  motor[leftMotor] = 0;
-}
 void closeClaw(){
   motor[ClawMotor] = 70;
-  wait1Msec(200);
+  wait1Msec(2000);
   motor[ClawMotor] = 0;
 }
 void openClaw(){
@@ -91,25 +83,35 @@ void openClaw(){
   wait1Msec(200);
   motor[ClawMotor] = 0;
 }
+void armDown(){
+  motor[ArmMotor] = -70;
+  wait1Msec(500);
+  motor[ArmMotor] = 0;
+}
+void armUp(){
+  motor[ArmMotor] = 70;
+  wait1Msec(500);
+  motor[ArmMotor] = 0;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++| MAIN |+++++++++++++++++++++++++++++++++++++++++++++++
+
 task main()
 {
+
 	while(true)
 	{
 	if(vexRT[Btn7L] == 1){
 	while(1 == 1)
 	{
-
-	SensorValue[rightEncoder] = 0;
 	openClaw();
   wait1Msec(2000);          // The program waits for 2000 milliseconds before continuing.
   followLine();
+  armDown();
   closeClaw();
-  SensorValue[rightEncoder] = 0;
-  rotate();
+  armUp();
   followLine();
-                            /* surfaces, adding them together, then dividing by 2. */
   openClaw();
+                            /* surfaces, adding them together, then dividing by 2. */
   StopAllTasks();
 }
 }
