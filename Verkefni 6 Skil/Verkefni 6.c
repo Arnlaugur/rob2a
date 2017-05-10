@@ -44,7 +44,7 @@ void followLine(){
     {
       // counter-steer right:
       motor[leftMotor]  = 100;
-      motor[rightMotor] = -40;
+      motor[rightMotor] = -60;
     }
     motor[leftMotor]  = 0;
       motor[rightMotor] = 0;
@@ -61,7 +61,7 @@ void followLine(){
     if(SensorValue(lineFollowerLEFT) > threshold)
     {
       // counter-steer left:
-      motor[leftMotor]  = -40;
+      motor[leftMotor]  = -60;
       motor[rightMotor] = 100;
     }
     motor[leftMotor]  = 0;
@@ -89,7 +89,7 @@ void armDown(){
   motor[ArmMotor] = 0;
 }
 void armUp(){
-  motor[ArmMotor] = 70;
+  motor[ArmMotor] = -70;
   wait1Msec(500);
   motor[ArmMotor] = 0;
 }
@@ -106,7 +106,6 @@ task main()
 	openClaw();
   wait1Msec(2000);          // The program waits for 2000 milliseconds before continuing.
   followLine();
-  armDown();
   closeClaw();
   armUp();
   followLine();
